@@ -1,0 +1,19 @@
+{
+  "name": "claims-playwright-qa-framework",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:clean": "rimraf test-results playwright-report .playwright && playwright test",
+    "test:ui": "playwright test tests/ui",
+    "test:api": "playwright test tests/api",
+    "test:headed": "PLAYWRIGHT_HEADED=1 playwright test --headed",
+    "test:report": "playwright show-report",
+    "test:list": "playwright test --list"
+  },
+  "dependencies": {
+    "@playwright/test": "^1.49.1",
+    "dotenv": "^16.4.5"
+  }
+}
