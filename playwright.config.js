@@ -1,4 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const isHeaded = process.env.PLAYWRIGHT_HEADED === '1';
 

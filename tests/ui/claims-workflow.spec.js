@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../support/page-objects/loginPage.js';
+import { ClaimsPage } from '../support/page-objects/claimsPage.js';
 import { users } from '../support/fixtures/users.js';
 import { setupArtifactsForTest, getArtifactsForTest, finalizeArtifactsForTest } from '../support/testArtifacts.js';
 
@@ -21,78 +22,82 @@ test.describe('Claim creation and validation', () => {
   test('claimant submits a valid claim through the wizard', async ({ page }, testInfo) => {
     const artifacts = getArtifactsForTest(testInfo);
     const loginPage = new LoginPage(page);
+    const claimsPage = new ClaimsPage(page);
 
     await loginPage.login(users.claimant);
     await artifacts.captureStep('after-login');
 
-    await page.goto('/claims/new');
-    await page.locator('input#incidentDate').fill('2026-10-28');
-    await page.locator('input#incidentLocation').fill('Sydney CBD');
-    await page.locator('input#claimAmount').fill('1200');
+    await claimsPage.openNewClaim();
+    await claimsPage.fillIncidentDate('2026-10-28');
+    await claimsPage.fillIncidentLocation('Sydney CBD');
+    await claimsPage.fillClaimAmount(1200);
     await artifacts.captureStep('step-1-filled');
-    await page.getByRole('button', { name: /^Next$/i }).click();
+    await claimsPage.clickNext();
 
-    await page.locator('textarea#description').fill('This is a valid claim for QA automation and should be accepted by the application with enough detail.');
+    await claimsPage.fillDescription('This is a valid claim for QA automation and should be accepted by the application with enough detail.');
     await artifacts.captureStep('step-2-filled');
-    await page.getByRole('button', { name: /^Next$/i }).click();
+    await claimsPage.clickNext();
 
-    await expect(page.getByRole('heading', { name: /Review Your Claim/i })).toBeVisible();
+    await claimsPage.expectReviewVisible();
     await artifacts.captureStep('review-step');
-    await page.getByTestId('wizard-step-3').getByRole('button', { name: /^Submit Claim$/i }).click();
+    await claimsPage.clickSubmitClaim();
 
     await expect(page).toHaveURL(/\/claims$/);
-    await expect(page.getByText(/Submitted|Under Review|Approved|Rejected|Closed/i).first()).toBeVisible();
+    await claimsPage.expectStatusVisible();
     await artifacts.captureStep('after-submit');
   });
 
   test('claim validation rejects invalid claim values', async ({ page }, testInfo) => {
     const artifacts = getArtifactsForTest(testInfo);
     const loginPage = new LoginPage(page);
+    const claimsPage = new ClaimsPage(page);
 
     await loginPage.login(users.claimant);
-    await page.goto('/claims/new');
+    await claimsPage.openNewClaim();
 
-    await page.locator('input#incidentDate').fill(futureDateString(1));
-    await page.locator('input#incidentLocation').fill('abc');
-    await page.locator('input#claimAmount').fill('0');
-    await page.locator('input#claimAmount').blur();
+    await claimsPage.fillIncidentDate(futureDateString(1));
+    await claimsPage.fillIncidentLocation('abc');
+    await claimsPage.fillClaimAmount(0);
+    await claimsPage.blurClaimAmount();
 
-    await expect(page.locator('#incidentDate-error')).toContainText(/cannot be in the future/i);
-    await expect(page.locator('#incidentLocation-error')).toContainText(/at least 5 characters/i);
-    await expect(page.locator('#claimAmount-error')).toContainText(/at least \$0\.01/i);
+    await claimsPage.expectIncidentDateErrorContains(/cannot be in the future/i);
+    await claimsPage.expectIncidentLocationErrorContains(/at least 5 characters/i);
+    await claimsPage.expectClaimAmountErrorContains(/at least \$0\.01/i);
     await artifacts.captureScreenshot('invalid-values');
   });
 
   test('description length validation is enforced for claims', async ({ page }, testInfo) => {
     const artifacts = getArtifactsForTest(testInfo);
     const loginPage = new LoginPage(page);
+    const claimsPage = new ClaimsPage(page);
 
     await loginPage.login(users.claimant);
-    await page.goto('/claims/new');
-    await page.locator('input#incidentDate').fill('2026-10-28');
-    await page.locator('input#incidentLocation').fill('Sydney CBD');
-    await page.locator('input#claimAmount').fill('250');
-    await page.getByRole('button', { name: /^Next$/i }).click();
+    await claimsPage.openNewClaim();
+    await claimsPage.fillIncidentDate('2026-10-28');
+    await claimsPage.fillIncidentLocation('Sydney CBD');
+    await claimsPage.fillClaimAmount(250);
+    await claimsPage.clickNext();
 
-    await page.locator('textarea#description').fill('short');
-    await page.locator('textarea#description').blur();
-    await expect(page.locator('#description-error')).toContainText(/at least 10 characters/i);
+    await claimsPage.fillDescription('short');
+    await claimsPage.blurDescription();
+    await claimsPage.expectDescriptionErrorContains(/at least 10 characters/i);
 
     const longText = 'A'.repeat(1001);
-    await page.locator('textarea#description').fill(longText);
-    await page.locator('textarea#description').blur();
-    await expect(page.locator('textarea#description')).toHaveValue('A'.repeat(1000));
+    await claimsPage.fillDescription(longText);
+    await claimsPage.blurDescription();
+    await claimsPage.expectDescriptionValue('A'.repeat(1000));
     await artifacts.captureScreenshot('description-validation');
   });
 
   test('claim list contains no delete action for claimant workflow', async ({ page }, testInfo) => {
     const artifacts = getArtifactsForTest(testInfo);
     const loginPage = new LoginPage(page);
+    const claimsPage = new ClaimsPage(page);
 
     await loginPage.login(users.claimant);
-    await page.goto('/claims');
-    await expect(page.getByRole('heading', { name: /My Claims/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /Delete/i })).toHaveCount(0);
+    await claimsPage.goto();
+    await loginPage.expectClaimsPageVisible();
+    await claimsPage.expectNoDeleteAction();
     await artifacts.captureScreenshot('no-delete-control');
   });
 });

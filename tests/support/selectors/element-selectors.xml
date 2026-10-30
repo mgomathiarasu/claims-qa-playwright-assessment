@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<locators>
+  <page name="login">
+    <key name="emailInput">//input[@name='email']</key>
+    <key name="passwordInput">//input[@name='password']</key>
+    <key name="submitButton">//button[normalize-space()='Log In']</key>
+    <key name="loginForm">//form</key>
+    <key name="logoutButton">//button[normalize-space()='Logout']</key>
+    <key name="adminDashboardHeading">//h1[contains(normalize-space(),'Admin Dashboard')]</key>
+    <key name="claimsPageHeading">//h1[contains(normalize-space(),'My Claims') or contains(normalize-space(),'Claims')]</key>
+  </page>
+
+  <page name="claims">
+    <key name="incidentDateInput">//input[@id='incidentDate']</key>
+    <key name="incidentLocationInput">//input[@id='incidentLocation']</key>
+    <key name="claimAmountInput">//input[@id='claimAmount']</key>
+    <key name="nextButton">//button[normalize-space()='Next']</key>
+    <key name="descriptionInput">//textarea[@id='description']</key>
+    <key name="submitClaimButton">//*[@data-testid='wizard-step-3']//button[normalize-space()='Submit Claim']</key>
+    <key name="claimsListHeading">//h1[contains(normalize-space(),'My Claims') or contains(normalize-space(),'Claims')]</key>
+    <key name="noDeleteButton">//button[normalize-space()='Delete']</key>
+    <key name="reviewHeading">//h2[contains(normalize-space(),'Review Your Claim') or contains(normalize-space(),'Review Claim')]</key>
+    <key name="statusBadge">//*[contains(normalize-space(),'Submitted') or contains(normalize-space(),'Under Review') or contains(normalize-space(),'Approved') or contains(normalize-space(),'Rejected') or contains(normalize-space(),'Closed')][1]</key>
+    <key name="incidentDateError">//*[@id='incidentDate-error']</key>
+    <key name="incidentLocationError">//*[@id='incidentLocation-error']</key>
+    <key name="claimAmountError">//*[@id='claimAmount-error']</key>
+    <key name="descriptionError">//*[@id='description-error']</key>
+  </page>
+
+  <page name="adminDashboard">
+    <key name="dashboardHeading">//h1[contains(normalize-space(),'Admin Dashboard')]</key>
+    <key name="cacheLoadButton">//*[@aria-label='Load dashboard stats from cache']</key>
+    <key name="cacheFlushButton">//*[@aria-label='Flush cache and reload dashboard stats from database']</key>
+    <key name="statusSelect">//select[contains(@aria-label,'Update status')]</key>
+    <key name="confirmStatusButton">//button[normalize-space()='Confirm']</key>
+    <key name="statusIndicator">//*[contains(@aria-label,'Connection status:')]</key>
+    <key name="cacheBadge">//*[contains(normalize-space(),'Cache Hit') or contains(normalize-space(),'Cache Miss')]</key>
+    <key name="statusTextValue">//*[contains(normalize-space(),'{statusText}')]</key>
+  </page>
+</locators>

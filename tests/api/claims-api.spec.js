@@ -1,11 +1,14 @@
 import { test, expect } from '@playwright/test';
 import { users } from '../support/fixtures/users.js';
+import { LoginPage } from '../support/page-objects/loginPage.js';
 
 async function loginAndReturnPage(page, user) {
-  await page.goto('/login');
-  await page.locator('input[name="email"]').fill(user.email);
-  await page.locator('input[name="password"]').fill(user.password);
-  await page.getByRole('button', { name: /log in/i }).click();
+  const loginPage = new LoginPage(page);
+
+  await loginPage.goto();
+  await loginPage.fillEmail(user.email);
+  await loginPage.fillPassword(user.password);
+  await loginPage.submit();
   await page.waitForURL(/\/claims|\/admin\//);
   return page;
 }
